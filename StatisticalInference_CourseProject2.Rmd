@@ -1,0 +1,77 @@
+---
+title: "Statistical Inference Project, Part 2"
+author: "Nannette Spear"
+date: "July 23, 2018"
+output: 
+  html_document: 
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 6
+---
+
+##Overview
+Part II of the assignment invovles analyzing the ToothGrowth data in the R datasets
+package.  The analysis involves providing basic summary of the data, exploratory data analysis, and comparing tooth growth by supplements and dosages.  Conclusions will be drawn from the analysis.
+
+Load knitr package
+```{r load knitr, echo=FALSE}
+library(knitr)
+```
+Set the Working Directory
+````{r set working directory, echo=FALSE}
+opts_knit$set(root.dir = "C:/Coursera/Statistical Inference/Course Project")
+````
+Load the ToothGrowth Data
+````{r ToothGrowth Data}
+library(datasets)
+data(ToothGrowth)
+````
+
+##Basic Summary of Data
+````{r Data Summary}
+dim(ToothGrowth)
+names(ToothGrowth)
+str(ToothGrowth)
+````
+
+##Data Exploration
+````{r Average length per supp}
+aggregate(len ~ supp, ToothGrowth, mean)
+aggregate(len ~ dose, ToothGrowth, mean)
+````
+
+````{r Tooth Growth Grouped by Supplement and Dosage}
+library(ggplot2)
+d <- ggplot(ToothGrowth, aes(supp, len))
+d + geom_boxplot(aes(fill = factor(dose))) + 
+  labs(title = "Box Plot",
+       subtitle = "Tooth Growth Grouped by Supplement and Dosage ",
+       x = "Supp",
+       Y = "Length")
+````
+
+##Assumptions - Comparing tooth growth by supplements and dosages.
+1. Null Hypothesis:  The difference in the average tooth length is zero between the supplements. 
+```` {r Test Null Hypothesis}
+t.test(ToothGrowth$len ~ ToothGrowth$supp, paired = FALSE)
+````
+- The t value of 1.9153 falls within the confidence interval, therefore
+we fail to reject the null hypothesis that the difference in means is
+equal to 0.
+
+2.  Test the Null Hypothesis that the difference in the average tooth 
+length is zero amongst dosages. 
+- There are three comparisons: .5 to 1 mg, 1 to 2 mg, and .5 to 2 mg.  
+- One is shown below:
+
+- Compare dosages .5mg and 2mg
+```` {r subsetting3}
+dose.5b <- subset(ToothGrowth, ToothGrowth$dose == .5, 1)
+dose2b <- subset(ToothGrowth, ToothGrowth$dose == 2, 1)
+dosetest3 <- t.test(dose.5b, dose2b)
+dosetest3
+````
+##Conclusion comparing tooth length to dosage.
+For each test comparing doseages, the p-value is much smaller
+compared to the alpha of 0.05.  Hence we reject the Null Hypothesis
+that the difference in means amongst dosage is zero.

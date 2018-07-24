@@ -1,0 +1,111 @@
+---
+title: "Statistical Inference Project, Part 1"
+author: "Nannette Spear"
+date: "July 23, 2018"
+output:
+  html_document:
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 6
+    keep_md: yes
+  pdf_document: default
+---
+
+##Overview
+Part 1 of the course project involves applying the Central Limit
+Theorem to exponential distribution in R. The distribution of
+averages of 40 exponentials, simulated 1,000 times will be investigated.
+
+- Lambda is 0.2
+- Theoretical Mean is 1/0.2
+- Theoretical Standard Deviation is also 1/0.2
+- Observed data substitutes for the population
+- Random sampling (simulations) corresponds to the observations
+
+Load knitr package
+```{r load knitr, echo=FALSE}
+library(knitr)
+```
+Set the Working Directory
+````{r set working directory, echo=FALSE}
+opts_knit$set(root.dir = "C:/Coursera/Statistical Inference/Course Project")
+````
+
+Exponential Distribution of 40 exponentials
+````{r exponential, echo=TRUE}
+x <- rexp(40, 0.20)
+n <- length(x)
+````
+
+1000 Simulations
+````{r simulations, echo=TRUE}
+B <- 1000
+resamples <- matrix(sample(x, n*B, replace = TRUE),B, n)  
+means <- apply(resamples, 1, mean)
+````
+
+Theoretical Mean of the distribution
+````{r tmean, echo=TRUE}
+tmean <- 1/0.20
+tmean
+````
+Estimated Mean of all samples
+````{r est mean, echo=TRUE}
+estmean <- mean(means)
+estmean
+````
+The theoretical and estimated mean are very close to each other
+````{r varmean, echo=TRUE}
+meanvar <- estmean - tmean
+meanvar
+````
+The Theroetical Standard Deviation is = 1/lambda/sqrt(n)
+````{r tsd, echo = TRUE}
+tsd <- (1/0.20)/sqrt(n)
+tsd
+````
+The variance is the standard deviation squared
+````{r varsd, echo = TRUE}
+tvar <- tsd^2
+tvar
+````
+The estimated standard deviation
+````{r estsd, echo = TRUE}
+estsd <- sd(means)
+estsd
+````
+The estimated variance is the standard deviation squared
+````{r estvar, echo = TRUE}
+estvar <- estsd^2
+estvar
+````
+The theoretical and estimated variance are also very close to each other
+````{r varvar, echo = TRUE}
+varvar <- estvar - tvar
+varvar
+````
+
+95% Confidence Interval
+````{r confidence interval, echo=TRUE}
+CI <- quantile(means, c(0.025, 0.975))
+CI
+````
+
+This plot is an estimate of the sampling distribution of the mean
+````{r histogram, echo=TRUE}
+library(ggplot2)
+g <- ggplot(data.frame(means = means), aes(x=means))
+g <- g + geom_histogram(color = "black", fill = "lightblue", binwidth = 0.15)
+g <- g + geom_vline(xintercept = 5, size = 1, color = "orange")       
+g <- g + geom_vline(xintercept = CI, size = 0.5, color = "black", linetype ="dashed")
+g
+````
+
+##Conclusion
+- The histogram represents the simulation means distributed over
+a normal distribution.  
+- The orange vertical line at mean 5, represents the 
+theoretical mean.  
+- The area between the two dashed lines represent where the estimated or sample
+means will fall, 95% of the time.
+
